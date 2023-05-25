@@ -63,7 +63,8 @@ jobs:
             - name: Build and push
               uses: docker/build-push-action@v4
               with:
-                  context: ./docker/rust/prod
+                  context: .
+                  file: ./docker/rust/prod
                   push: true
                   tags: ${{ steps.meta.outputs.tags }}
                   labels: ${{ steps.meta.outputs.labels }}
@@ -127,7 +128,8 @@ jobs:
             - name: Build and push
               uses: docker/build-push-action@v4
               with:
-                  context: ./docker/node/prod
+                  context: .
+                  file: ./docker/node/prod
                   push: true
                   tags: ${{ steps.meta.outputs.tags }}
                   labels: ${{ steps.meta.outputs.labels }}
