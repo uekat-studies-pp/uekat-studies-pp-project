@@ -19,10 +19,10 @@ services:
             - common
             - backend
 
-    cron-app:
+    scrapper:
         build:
             context: .
-            dockerfile: docker/cron-app/dev/Dockerfile
+            dockerfile: docker/scrapper/dev/Dockerfile
             args:
                 - RUST_IMAGE_VERSION=${RUST_IMAGE_VERSION}
         platform: linux/x86_64
@@ -30,7 +30,7 @@ services:
         ports:
             - ${BACKEND_PORT}:8000
         volumes:
-            - ./cron-app:/app:rw
+            - ./scrapper:/app:rw
             - /etc/timezone:/etc/timezone:ro
             - /etc/localtime:/etc/localtime:ro
         networks:
