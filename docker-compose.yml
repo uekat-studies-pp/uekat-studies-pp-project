@@ -6,7 +6,7 @@ services:
             context: .
             dockerfile: docker/backend/dev/Dockerfile
             args:
-                - RUST_IMAGE_VERSION=${RUST_IMAGE_VERSION}
+                - PYTHON_IMAGE_VERSION=${PYTHON_IMAGE_VERSION}
         platform: linux/x86_64
         working_dir: /app
         ports:
@@ -24,7 +24,7 @@ services:
             context: .
             dockerfile: docker/scrapper/dev/Dockerfile
             args:
-                - RUST_IMAGE_VERSION=${RUST_IMAGE_VERSION}
+                - PYTHON_IMAGE_VERSION=${PYTHON_IMAGE_VERSION}
         platform: linux/x86_64
         working_dir: /app
         ports:
