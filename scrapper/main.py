@@ -1,3 +1,13 @@
+from requests_html import HTMLSession
+from bs4 import BeautifulSoup
+
+class Data:
+    def __init__(self, url, title, price, priceAfterDiscount = 0) -> None:
+        self.url = url
+        self.title = title
+        self.price = price
+        self.priceAfterDiscount = priceAfterDiscount
+
 class Scrapper:
     def __init__(self) -> None:
         self.data = []
@@ -17,7 +27,34 @@ class SteamScrapper(Scrapper):
         self.listUrl = "https://store.steampowered.com/search"
 
     def run(self) -> None:
-        pass
+        session = HTMLSession()
+        r = session.get(self.listUrl)
+
+        for element in r.html.find('#search_resultsRows a'):
+            url = element.attrs['href'] 
+            title = element.find('.title').text
+
+            priceAfterDiscount = None
+            price = element.find('.search_price')[0]
+            if "discounted" in price.attrs['class']:
+                priceAfterDiscount = price.find('strike')[0].text
+
+                soup = BeautifulSoup(price.html, "html.parser")
+                br = soup.find('br')
+                price = br.next_sibling.strip()
+            else:
+                price = price.text
+
+            self.data.append(
+                Data(
+                    url=url,
+                    title=title,
+                    price=price,
+                    priceAfterDiscount=priceAfterDiscount
+                )
+            )
+        
+        print(self.data)
 
 class GogScrapper(Scrapper):
     def __init__(self) -> None:
@@ -45,8 +82,8 @@ class App:
 
             print(data)
 
-        except:
-            print("An exception occurred")
+        except Exception as error:
+            print("An exception occurred:", error)
 
     def runSteam(self) -> None:
         pass
