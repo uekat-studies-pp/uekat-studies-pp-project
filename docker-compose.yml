@@ -19,10 +19,10 @@ services:
             - common
             - backend
 
-    scrapper:
+    scraper:
         build:
             context: .
-            dockerfile: docker/scrapper/dev/Dockerfile
+            dockerfile: docker/scraper/dev/Dockerfile
             args:
                 - PYTHON_IMAGE_VERSION=${PYTHON_IMAGE_VERSION}
         platform: linux/x86_64
@@ -30,7 +30,7 @@ services:
         ports:
             - ${BACKEND_PORT}:8000
         volumes:
-            - ./scrapper:/app:rw
+            - ./scraper:/app:rw
             - /etc/timezone:/etc/timezone:ro
             - /etc/localtime:/etc/localtime:ro
         networks:

@@ -74,7 +74,7 @@ jobs:
                     RUST_IMAGE_VERSION=${{ env.RUST_IMAGE_VERSION }}
                     CACHEBUST=${{ env.CACHEBUST }}
 
-    scrapper-image:
+    scraper-image:
         name: Build and push cron app image
         runs-on: ubuntu-latest
         permissions:
@@ -105,7 +105,7 @@ jobs:
               uses: docker/metadata-action@v4
               with:
                 images: |
-                  ghcr.io/uekat-studies-pp/uekat-studies-pp-project-scrapper
+                  ghcr.io/uekat-studies-pp/uekat-studies-pp-project-scraper
                 tags: |
                   type=schedule
                   type=ref,event=branch
@@ -129,7 +129,7 @@ jobs:
               uses: docker/build-push-action@v4
               with:
                   context: .
-                  file: ./docker/scrapper/prod/Dockerfile
+                  file: ./docker/scraper/prod/Dockerfile
                   push: true
                   tags: ${{ steps.meta.outputs.tags }}
                   labels: ${{ steps.meta.outputs.labels }}
