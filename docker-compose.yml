@@ -4,7 +4,7 @@ services:
     backend:
         build:
             context: .
-            dockerfile: docker/rust/dev/Dockerfile
+            dockerfile: docker/backend/dev/Dockerfile
             args:
                 - RUST_IMAGE_VERSION=${RUST_IMAGE_VERSION}
         platform: linux/x86_64
@@ -13,6 +13,24 @@ services:
             - ${BACKEND_PORT}:8000
         volumes:
             - ./backend:/app:rw
+            - /etc/timezone:/etc/timezone:ro
+            - /etc/localtime:/etc/localtime:ro
+        networks:
+            - common
+            - backend
+
+    cron-app:
+        build:
+            context: .
+            dockerfile: docker/cron-app/dev/Dockerfile
+            args:
+                - RUST_IMAGE_VERSION=${RUST_IMAGE_VERSION}
+        platform: linux/x86_64
+        working_dir: /app
+        ports:
+            - ${BACKEND_PORT}:8000
+        volumes:
+            - ./cron-app:/app:rw
             - /etc/timezone:/etc/timezone:ro
             - /etc/localtime:/etc/localtime:ro
         networks:

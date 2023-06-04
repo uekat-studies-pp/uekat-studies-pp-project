@@ -6,8 +6,8 @@ LABEL org.opencontainers.image.description='Uniwersytet Ekonimiczny in Katowice 
 LABEL org.opencontainers.image.licenses=MIT
 
 WORKDIR /app
-COPY backend .
+COPY cron-app .
 
 RUN cargo install --path .
 
-CMD ["backend"]
+CMD ["cron-app"]
