@@ -7,3 +7,5 @@ edition = "2021"
 
 [dependencies]
 job_scheduler = "*"
+voyager = "*"
+tokio = "*"
