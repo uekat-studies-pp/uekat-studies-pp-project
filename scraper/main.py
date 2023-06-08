@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import re
 import psycopg2
 import os
+from urllib.parse import urlparse, urlunparse
 
 
 class Data:
@@ -33,6 +34,7 @@ class PostgresAdapter(Database):
         self.cur = self.con.cursor()
         self.cur.execute(
             "CREATE TABLE IF NOT EXISTS public.data(id SERIAL, type VARCHAR(255), url VARCHAR(255) NOT NULL, title VARCHAR(255) NOT NULL, price FLOAT NOT NULL, priceAfterDiscount FLOAT, created_at TIMESTAMP DEFAULT NOW(), modified_at TIMESTAMP DEFAULT NOW())")
+        self.con.commit()
 
     def save(self, data: Data) -> None:
         self.cur.execute(
@@ -111,6 +113,7 @@ class SteamScraper(Scraper):
             for element in soup.find_all('a'):
                 try:
                     url = element.attrs['href']
+                    url = self.prepareElementUrl(url)
                     title = element.find(class_="title").text
 
                     priceAfterDiscount = None
@@ -153,6 +156,15 @@ class SteamScraper(Scraper):
 
     def prepareListUrl(self, start=0, count=100) -> str:
         return "https://store.steampowered.com/search/results/?query&start={}&count={}&infinite=1".format(start, count)
+
+    def prepareElementUrl(self, url: str) -> str:
+        parsed_url = urlparse(url)
+        query_params = parsed_url.query.split("&")
+        query_params = [param for param in query_params if not param.startswith("snr=")]
+        new_query = "&".join(query_params)
+        return urlunparse((parsed_url.scheme, parsed_url.netloc, parsed_url.path, parsed_url.params, new_query, parsed_url.fragment))
+
+
 
 
 class GogScraper(Scraper):
