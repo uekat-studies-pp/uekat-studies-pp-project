@@ -1,5 +1,5 @@
 from requests_html import HTMLSession
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, PageElement, ResultSet
 import re
 import psycopg2
 import os
@@ -173,8 +173,86 @@ class GogScraper(Scraper):
         self.domain = "gog.com"
         self.listUrl = "https://www.gog.com/games"
 
+    def prepareListUrl(self, page: int) -> str:
+        if page == 1:
+            return self.listUrl
+        else:
+            return "{}?page={}".format(self.listUrl, page)
+        
+    def extractData(self, soup: BeautifulSoup) -> list[Data]:
+        output = []
+        gameTiles: ResultSet[PageElement] = soup.find_all("a", {
+        "selenium-id": "productTile"
+        })
+        
+        for tile in gameTiles:
+            try:
+                url = tile.attrs["href"]
+                title = tile.find("div", {
+                    "class": "product-tile__title"
+                }, recursive = True).attrs["title"]
+                trim = re.compile(r'[^\d.,]+')
+                baseValue = None
+                finalValue = None
+                isFree = False
+                baseValueElement = tile.find("span", {
+                    "class": "base-value"
+                }, recursive = True)
+                if baseValueElement is not None:
+                    text = str(baseValueElement.string)
+                    baseValue = float(trim.sub('', text).replace(',', '.'))
+                finalValueElement = tile.find("span", {
+                    "class": "final-value"
+                }, recursive = True)
+                if baseValueElement is not None:
+                    finalValueText = str(finalValueElement.string)
+                    finalValue = float(trim.sub('', finalValueText).replace(',', '.'))
+                isFree = tile.find("span", {
+                    "selenium-id": "productPriceFreeLabel"
+                }, recursive = True) is not None
+                price: float
+                priceAfterDiscount: float | None = None
+                if isFree:
+                    price = 0
+                if baseValue is not None:
+                    priceAfterDiscount = finalValue
+                    price = baseValue
+                else:
+                    price = finalValue
+                data = Data(
+                    type="gog",
+                    url=url,
+                    title=title,
+                    price=price,
+                    priceAfterDiscount=priceAfterDiscount
+                )
+                output.append(data)
+            except:
+                pass
+        return output
+
     def run(self) -> None:
-        pass
+        page = 1
+        pageNumber = 0
+        session = HTMLSession()
+        r = session.get(self.prepareListUrl(page))
+        json = r.json()
+        soup = BeautifulSoup(json['results_html'], "html.parser")
+        # Extract the amount of pages to go
+        if page == 1:
+            pageNumbers: ResultSet[PageElement] = soup.find_all("button", {
+                "selenium-id": "paginationPage"
+            })
+            lastPageNumber = pageNumbers[-1]
+            innerText= lastPageNumber.contents[0]
+            pageNumber = int(str(innerText.string))
+        while (page < pageNumber):
+            r = session.get(self.prepareListUrl(page))
+            json = r.json()
+            soup = BeautifulSoup(json['results_html'], "html.parser")
+            for game in self.extractData(soup):
+                self.db.save(game)
+    
 
 
 class App:
