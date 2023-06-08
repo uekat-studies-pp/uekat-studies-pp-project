@@ -1,6 +1,6 @@
 <template>
   <div>
-    <form :action="action" :method="method">
+    <form :action="action" :method="method" @submit.prevent="submit">
       <div v-for="(element, key) in elements" v-bind:key="key">
         <div v-if="element.type == 'select'">
           <label :for="element.id">{{ element.label }}</label>
@@ -57,6 +57,20 @@ export default {
   methods: {
     urlParamHasKeyValue(key: string, value: string) {
       return this.urlParams.get(key) == value
+    },
+    submit(e) {
+      const criteria = {};
+      const formData = new FormData(e.currentTarget);
+
+      if (formData.has('t')) {
+        criteria['t'] = formData.get('t');
+      }
+
+      if (formData.has('type')) {
+        criteria['type'] = formData.get('type');
+      }
+
+      this.$emit('updateListFromApi', criteria);
     }
   }
 }

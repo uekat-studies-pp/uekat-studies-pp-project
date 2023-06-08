@@ -1,8 +1,8 @@
 <template>
   <div>
-    <FiltersComponent />
+    <FiltersComponent @updateListFromApi="updateListFromApi" />
     <ContentComponent :list="list" />
-    <PaginationComponent :pagination="pagination" />
+    <PaginationComponent :pagination="pagination" @updateListFromApi="updateListFromApi"/>
   </div>
 </template>
 

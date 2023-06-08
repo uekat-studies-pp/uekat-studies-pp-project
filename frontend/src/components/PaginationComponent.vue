@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a v-for="(v, k) in pagination" v-bind:key="k" :href="calculateHref(v['page'])">{{ v['page'] }}</a>
+    <a v-for="(v, k) in pagination" v-bind:key="k" :href="calculateHref(v['page'])" @click.prevent="click" :data-page="v['page']">{{ v['page'] != null ? v['page'] : '...' }}</a>
   </div>
 </template>
 
@@ -23,6 +23,14 @@ export default {
       url.searchParams.set('page', page);
 
       return url.toString();
+    },
+    click(e) {
+      const criteria = {};
+      if (e.currentTarget.dataset['page']) {
+        criteria['page'] = e.currentTarget.dataset['page'];
+      }
+
+      this.$emit('updateListFromApi', criteria);
     }
   }
 }
