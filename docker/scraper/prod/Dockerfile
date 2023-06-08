@@ -22,4 +22,4 @@ ENV POSTGRES_HOST=${POSTGRES_HOST}
 ARG POSTGRES_PORT=5432
 ENV POSTGRES_PORT=${POSTGRES_PORT}
 
-CMD ["sh", "-c", "python /app/main.py; crond"]
+CMD ["sh", "-c", "crond"]
