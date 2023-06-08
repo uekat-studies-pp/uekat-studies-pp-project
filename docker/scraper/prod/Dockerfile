@@ -9,7 +9,7 @@ WORKDIR /app
 COPY scraper .
 
 RUN pip install -r requirements.txt
-RUN crontab -l | { cat; echo "0 * * * * python /app/main.py"; } | crontab -
+RUN crontab -l | { cat; echo "0 0 * * * python /app/main.py"; } | crontab -
 
 ARG POSTGRES_USER=default
 ENV POSTGRES_USER=${POSTGRES_USER}
