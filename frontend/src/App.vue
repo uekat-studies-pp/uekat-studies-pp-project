@@ -2,7 +2,7 @@
   <div>
     <FiltersComponent @updateListFromApi="updateListFromApi" />
     <ContentComponent :list="list" />
-    <PaginationComponent :pagination="pagination" @updateListFromApi="updateListFromApi"/>
+    <PaginationComponent :pagination="pagination" @updateListFromApi="updateListFromApi" />
   </div>
 </template>
 
@@ -17,7 +17,7 @@ export default {
     FiltersComponent,
     ContentComponent,
     PaginationComponent
-},
+  },
   data() {
     return {
       list: [],
@@ -28,9 +28,9 @@ export default {
     this.updateListFromApi()
   },
   methods: {
-    updateListFromApi(criteria = {}) {
+    updateListFromApi(criteria: { [key: string]: any } = {}) {
       const self = this;
-      const url = new URL(window.location);
+      const url = new URL(window.location.toString());
       url.pathname = "/api/list";
 
       for (const key in criteria) {

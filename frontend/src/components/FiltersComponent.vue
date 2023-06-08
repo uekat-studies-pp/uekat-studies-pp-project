@@ -5,7 +5,8 @@
         <div v-if="element.type == 'select'">
           <label :for="element.id">{{ element.label }}</label>
           <select :id="element.id" :name="element.name">
-            <option v-for="(v, k) in element.options" v-bind:key="k" :value="k" :selected="urlParamHasKeyValue(element.name, k) ? true : false">
+            <option v-for="(v, k) in element.options" v-bind:key="k" :value="k"
+              :selected="urlParamHasKeyValue(element.name, k) ? true : false">
               {{ v }}
             </option>
           </select>
@@ -58,8 +59,8 @@ export default {
     urlParamHasKeyValue(key: string, value: string) {
       return this.urlParams.get(key) == value
     },
-    submit(e) {
-      const criteria = {};
+    submit(e: any) {
+      const criteria: { [key: string]: any } = {};
       const formData = new FormData(e.currentTarget);
 
       if (formData.has('t')) {

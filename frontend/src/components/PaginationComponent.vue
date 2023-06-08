@@ -5,27 +5,31 @@
 </template>
 
 <script lang="ts">
+interface PaginationItem {
+  page: string;
+}
+
 export default {
   name: "PaginationComponent",
   props: {
     pagination: {
       required: true,
-      type: Array,
+      type:  Array as () => PaginationItem[],
     }
   },
   methods: {
-    calculateHref(page) {
+    calculateHref(page: string) {
       if (page == "...") {
-        return false;
+        return undefined;
       }
 
-      const url = new URL(window.location);
+      const url = new URL(window.location.toString());
       url.searchParams.set('page', page);
 
       return url.toString();
     },
-    click(e) {
-      const criteria = {};
+    click(e: any) {
+      const criteria: { [key: string]: any } = {};
       if (e.currentTarget.dataset['page']) {
         criteria['page'] = e.currentTarget.dataset['page'];
       }

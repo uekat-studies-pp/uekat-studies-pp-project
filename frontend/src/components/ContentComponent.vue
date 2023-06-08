@@ -26,7 +26,7 @@ export default {
   props: {
     list: {
       required: true,
-      type: Array,
+      type: Array<Object>,
     }
   }
 }
