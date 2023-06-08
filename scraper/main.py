@@ -296,7 +296,7 @@ class App:
     def __init__(self) -> None:
         self.db = PostgresAdapter()
         self.scrapers = [
-            #SteamScraper(self.db),
+            SteamScraper(self.db),
             GogScraper(self.db),
         ]
 
