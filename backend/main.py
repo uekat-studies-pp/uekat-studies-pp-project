@@ -78,7 +78,7 @@ async def latest():
     db = PostgresAdapter()
 
     return {
-        'data': db.findOneBy()
+        'item': db.findOneBy()
     }
 
 @app.get("/api/list")
@@ -100,7 +100,7 @@ async def list(limit: int = None, page: int = None, t: str = None, type: str = N
         criteria['type'] = type.lower().strip()
 
     return {
-        'data': db.findBy(criteria)
+        'list': db.findBy(criteria)
     }
 
 if __name__ == "__main__":

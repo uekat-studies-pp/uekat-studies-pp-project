@@ -37,7 +37,7 @@ export default {
       }
 
       fetch(url.toString()).then(response => response.json()).then(data => {
-        self.list = data.data;
+        self.list = data.list;
       })
     }
   }
