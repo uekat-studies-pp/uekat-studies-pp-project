@@ -239,19 +239,19 @@ class GogScraper(Scraper):
         json = r.json()
         soup = BeautifulSoup(json['results_html'], "html.parser")
         # Extract the amount of pages to go
-        if page == 1:
-            pageNumbers: ResultSet[PageElement] = soup.find_all("button", {
-                "selenium-id": "paginationPage"
-            })
-            lastPageNumber = pageNumbers[-1]
-            innerText= lastPageNumber.contents[0]
-            pageNumber = int(str(innerText.string))
-        while (page < pageNumber):
+        pageNumbers: ResultSet[PageElement] = soup.find_all("button", {
+            "selenium-id": "paginationPage"
+        })
+        lastPageNumber = pageNumbers[-1]
+        innerText= lastPageNumber.contents[0]
+        pageNumber = int(str(innerText.string))
+        while (page <= pageNumber):
             r = session.get(self.prepareListUrl(page))
             json = r.json()
             soup = BeautifulSoup(json['results_html'], "html.parser")
             for game in self.extractData(soup):
                 self.db.save(game)
+            page += 1
     
 
 
@@ -264,11 +264,12 @@ class App:
         }
 
     def run(self) -> None:
-        try:
-            for key, scraper in self.scrapers.items():
+        print("Running scrapers")
+        for scraper in self.scrapers.values():
+            try:
                 scraper.run()
-        except Exception as error:
-            print("An exception occurred:", error)
+            except Exception as error:
+                print("An exception occurred:", error)
 
     def runSteam(self) -> None:
         pass
