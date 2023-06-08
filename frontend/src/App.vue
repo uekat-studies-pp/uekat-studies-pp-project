@@ -2,22 +2,26 @@
   <div>
     <FiltersComponent />
     <ContentComponent :list="list" />
+    <PaginationComponent :pagination="pagination" />
   </div>
 </template>
 
 <script lang="ts">
 import FiltersComponent from './components/FiltersComponent.vue'
 import ContentComponent from './components/ContentComponent.vue'
+import PaginationComponent from './components/PaginationComponent.vue'
 
 export default {
   name: "App",
   components: {
     FiltersComponent,
-    ContentComponent
-  },
+    ContentComponent,
+    PaginationComponent
+},
   data() {
     return {
-      list: []
+      list: [],
+      pagination: []
     }
   },
   created() {
@@ -38,6 +42,7 @@ export default {
 
       fetch(url.toString()).then(response => response.json()).then(data => {
         self.list = data.list;
+        self.pagination = data.pagination;
       })
     }
   }
