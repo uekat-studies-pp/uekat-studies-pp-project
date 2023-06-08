@@ -11,40 +11,38 @@ services:
         depends_on:
             - backend
             - frontend
-        volumes:
-            - app_data:/app/:ro
         networks:
             - backend
             - frontend
 
     backend:
-        image: ghcr.io/uekat-studies-pp/uekat-studies-pp-project-backend:${PYTHON_IMAGE_TAG}
+        image: ghcr.io/uekat-studies-pp/uekat-studies-pp-project-backend:${BACKEND_IMAGE_TAG}
         platform: linux/x86_64
         working_dir: /app
         ports:
             - ${BACKEND_PORT}:8000
         volumes:
-            - app_data:/app/:ro
+            - backend_data:/app/:ro
         networks:
             - backend
 
     scraper:
-        image: ghcr.io/uekat-studies-pp/uekat-studies-pp-project-scraper:${PYTHON_IMAGE_TAG}
+        image: ghcr.io/uekat-studies-pp/uekat-studies-pp-project-scraper:${SCRAPER_IMAGE_TAG}
         platform: linux/x86_64
         working_dir: /app
         volumes:
-            - app_data:/app/:ro
+            - scraper_data:/app/:ro
         networks:
             - backend
 
     frontend:
-        image: ghcr.io/uekat-studies-pp/uekat-studies-pp-project-frontend:${NODE_IMAGE_TAG}
+        image: ghcr.io/uekat-studies-pp/uekat-studies-pp-project-frontend:${FRONTEND_IMAGE_TAG}
         platform: linux/x86_64
         working_dir: /app
         ports:
             - ${FRONTEND_PORT}:5173
         volumes:
-            - app_data:/app/:ro
+            - frontend_data:/app/:ro
         networks:
             - frontend
 
@@ -67,5 +65,7 @@ networks:
     backend:
 
 volumes:
-    app_data:
+    backend_data:
+    scraper_data:
+    frontend_data:
     db_data:
