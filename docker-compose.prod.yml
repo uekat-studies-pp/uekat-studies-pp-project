@@ -2,7 +2,7 @@ version: "3"
 
 services:
     nginx:
-        image: ghcr.io/uekat-studies-pp/uekat-studies-pp-project-nginx:${NIGNX_IMAGE_TAG}
+        image: ghcr.io/uekat-studies-pp/uekat-studies-pp-project-nginx:${NGINX_IMAGE_TAG}
         platform: linux/x86_64
         working_dir: /app
         ports:
@@ -67,4 +67,5 @@ networks:
     backend:
 
 volumes:
+    app_data:
     db_data:

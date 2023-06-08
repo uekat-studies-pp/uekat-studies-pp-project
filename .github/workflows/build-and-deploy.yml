@@ -32,8 +32,7 @@ jobs:
 
             - name: Set env
               run: |
-                echo "RUST_IMAGE_VERSION=${RUST_IMAGE_VERSION}" >> $GITHUB_ENV
-                echo "CACHEBUST=$(date +%s)" >> $GITHUB_ENV
+                echo "NGINX_IMAGE_VERSION=${NGINX_IMAGE_VERSION}" >> $GITHUB_ENV
 
             - name: Docker meta
               id: meta
@@ -71,8 +70,7 @@ jobs:
                   cache-from: type=gha
                   cache-to: type=gha,mode=max
                   build-args: |
-                    RUST_IMAGE_VERSION=${{ env.RUST_IMAGE_VERSION }}
-                    CACHEBUST=${{ env.CACHEBUST }}
+                    NGINX_IMAGE_VERSION=${{ env.NGINX_IMAGE_VERSION }}
 
     backend-image:
         name: Build and push backend image
@@ -97,8 +95,12 @@ jobs:
 
             - name: Set env
               run: |
-                echo "RUST_IMAGE_VERSION=${RUST_IMAGE_VERSION}" >> $GITHUB_ENV
-                echo "CACHEBUST=$(date +%s)" >> $GITHUB_ENV
+                echo "PYTHON_IMAGE_VERSION=${PYTHON_IMAGE_VERSION}" >> $GITHUB_ENV
+                echo "POSTGRES_USER=${POSTGRES_USER}" >> $GITHUB_ENV
+                echo "POSTGRES_PASSWORD=${POSTGRES_PASSWORD}" >> $GITHUB_ENV
+                echo "POSTGRES_DB=${POSTGRES_DB}" >> $GITHUB_ENV
+                echo "POSTGRES_HOST=${POSTGRES_HOST}" >> $GITHUB_ENV
+                echo "POSTGRES_PORT=${POSTGRES_PORT}" >> $GITHUB_ENV
 
             - name: Docker meta
               id: meta
@@ -136,8 +138,12 @@ jobs:
                   cache-from: type=gha
                   cache-to: type=gha,mode=max
                   build-args: |
-                    RUST_IMAGE_VERSION=${{ env.RUST_IMAGE_VERSION }}
-                    CACHEBUST=${{ env.CACHEBUST }}
+                    PYTHON_IMAGE_VERSION=${{ env.PYTHON_IMAGE_VERSION }}
+                    POSTGRES_USER=${{ env.POSTGRES_USER }}
+                    POSTGRES_PASSWORD=${{ env.POSTGRES_PASSWORD }}
+                    POSTGRES_DB=${{ env.POSTGRES_DB }}
+                    POSTGRES_HOST=${{ env.POSTGRES_HOST }}
+                    POSTGRES_PORT=${{ env.POSTGRES_PORT }}
 
     scraper-image:
         name: Build and push cron app image
@@ -162,8 +168,12 @@ jobs:
 
             - name: Set env
               run: |
-                echo "RUST_IMAGE_VERSION=${RUST_IMAGE_VERSION}" >> $GITHUB_ENV
-                echo "CACHEBUST=$(date +%s)" >> $GITHUB_ENV
+                echo "PYTHON_IMAGE_VERSION=${PYTHON_IMAGE_VERSION}" >> $GITHUB_ENV
+                echo "POSTGRES_USER=${POSTGRES_USER}" >> $GITHUB_ENV
+                echo "POSTGRES_PASSWORD=${POSTGRES_PASSWORD}" >> $GITHUB_ENV
+                echo "POSTGRES_DB=${POSTGRES_DB}" >> $GITHUB_ENV
+                echo "POSTGRES_HOST=${POSTGRES_HOST}" >> $GITHUB_ENV
+                echo "POSTGRES_PORT=${POSTGRES_PORT}" >> $GITHUB_ENV
 
             - name: Docker meta
               id: meta
@@ -201,8 +211,12 @@ jobs:
                   cache-from: type=gha
                   cache-to: type=gha,mode=max
                   build-args: |
-                    RUST_IMAGE_VERSION=${{ env.RUST_IMAGE_VERSION }}
-                    CACHEBUST=${{ env.CACHEBUST }}
+                    PYTHON_IMAGE_VERSION=${{ env.PYTHON_IMAGE_VERSION }}
+                    POSTGRES_USER=${{ env.POSTGRES_USER }}
+                    POSTGRES_PASSWORD=${{ env.POSTGRES_PASSWORD }}
+                    POSTGRES_DB=${{ env.POSTGRES_DB }}
+                    POSTGRES_HOST=${{ env.POSTGRES_HOST }}
+                    POSTGRES_PORT=${{ env.POSTGRES_PORT }}
 
     frontend-image:
         name: Build and push frontend image
@@ -228,7 +242,6 @@ jobs:
             - name: Set env
               run: |
                 echo "NODE_IMAGE_VERSION=${NODE_IMAGE_VERSION}" >> $GITHUB_ENV
-                echo "CACHEBUST=$(date +%s)" >> $GITHUB_ENV
 
             - name: Docker meta
               id: meta
@@ -267,4 +280,3 @@ jobs:
                   cache-to: type=gha,mode=max
                   build-args: |
                     NODE_IMAGE_VERSION=${{ env.NODE_IMAGE_VERSION }}
-                    CACHEBUST=${{ env.CACHEBUST }}
