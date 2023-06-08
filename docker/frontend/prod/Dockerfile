@@ -11,5 +11,6 @@ COPY frontend .
 
 RUN yarn install
 RUN yarn build
+RUN yarn add global http-server
 
-CMD ["node", "dist/main"]
+CMD ["http-server", "-p", "5173", "dist"]
