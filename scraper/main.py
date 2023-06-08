@@ -171,7 +171,7 @@ class GogScraper(Scraper):
     def __init__(self, db: Database) -> None:
         Scraper.__init__(self, db)
         self.domain = "gog.com"
-        self.listUrl = "https://www.gog.com/games"
+        self.listUrl = "https://www.gog.com/pl/games"
 
     def prepareListUrl(self, page: int) -> str:
         if page == 1:
