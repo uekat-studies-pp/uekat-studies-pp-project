@@ -74,7 +74,7 @@ class PostgresAdapter(Database):
         return results
 
 @app.get("/api/latest")
-async def test():
+async def latest():
     db = PostgresAdapter()
 
     return {
@@ -82,7 +82,7 @@ async def test():
     }
 
 @app.get("/api/list")
-async def test(limit: int = None, page: int = None, t: str = None, type: str None):
+async def list(limit: int = None, page: int = None, t: str = None, type: str = None):
     db = PostgresAdapter()
 
     criteria = {}
