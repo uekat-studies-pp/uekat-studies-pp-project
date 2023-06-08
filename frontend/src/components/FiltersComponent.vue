@@ -2,7 +2,18 @@
   <div>
     <form :action="action" :method="method">
       <div v-for="(element, key) in elements" v-bind:key="key">
-        <input :type="element.type" :name="element.name" :value="element.value" />
+        <div v-if="element.type == 'select'">
+          <label :for="element.id">{{ element.label }}</label>
+          <select :id="element.id" :name="element.name">
+            <option v-for="(v, k) in element.options" v-bind:key="k" :value="k" :selected="urlParamHasKeyValue(element.name, k) ? true : false">
+              {{ v }}
+            </option>
+          </select>
+        </div>
+        <div v-else>
+          <label :for="element.id">{{ element.label }}</label>
+          <input :type="element.type" :id="element.id" :name="element.name" :value="element.value" />
+        </div>
       </div>
       <input type="submit" value="Submit" />
     </form>
@@ -18,20 +29,34 @@ export default {
     const urlParams = new URLSearchParams(queryString);
 
     return {
-      action: "/api/list",
+      urlParams: urlParams,
+      action: "/",
       method: "get",
       elements: [
         {
           type: "text",
+          id: "t",
           name: "t",
           value: urlParams.get('t'),
+          label: "Tytuł",
         },
         {
-          type: "text",
+          type: "select",
+          id: "type",
           name: "type",
           value: urlParams.get('type'),
+          label: "Typ",
+          options: {
+            'steam': "Steam",
+            'gog': "Gog",
+          }
         }
       ]
+    }
+  },
+  methods: {
+    urlParamHasKeyValue(key: string, value: string) {
+      return this.urlParams.get(key) == value
     }
   }
 }
