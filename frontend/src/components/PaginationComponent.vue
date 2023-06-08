@@ -1,12 +1,14 @@
 <template>
   <div>
-    <a v-for="(v, k) in pagination" v-bind:key="k" :href="calculateHref(v['page'])" @click.prevent="click" :data-page="v['page']">{{ v['page'] != null ? v['page'] : '...' }}</a>
+    <a v-for="(v, k) in pagination" v-bind:key="k" :href="calculateHref(v['page'])" @click.prevent="click"
+      :data-page="v['page']" :class="v['active'] ? 'active' : ''">{{ v['page'] != null ? v['page'] : '...' }}</a>
   </div>
 </template>
 
 <script lang="ts">
 interface PaginationItem {
   page: string;
+  active: boolean;
 }
 
 export default {
@@ -14,7 +16,7 @@ export default {
   props: {
     pagination: {
       required: true,
-      type:  Array as () => PaginationItem[],
+      type: Array as () => PaginationItem[],
     }
   },
   methods: {

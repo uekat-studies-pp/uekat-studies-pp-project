@@ -264,21 +264,27 @@ def preparePagination(db: Database, criteria: dict) -> list:
                 'page': 1,
             })
 
-        pagination.append({
-            'active': False,
-            'page': None,
-        })
-
-        for i in range(page - 1, page + 2):
+        if page > 3 and page < max - 2:
             pagination.append({
-                'active': i == page,
-                'page': i,
+                'active': False,
+                'page': None,
             })
 
-        pagination.append({
-            'active': False,
-            'page': None,
-        })
+            for i in range(page - 1, page + 2):
+                pagination.append({
+                    'active': i == page,
+                    'page': i,
+                })
+
+            pagination.append({
+                'active': False,
+                'page': None,
+            })
+        else:
+            pagination.append({
+                'active': False,
+                'page': None,
+            })
 
         if page >= max - 2:
             for i in range(page - 1, max + 1):
