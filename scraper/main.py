@@ -1,3 +1,4 @@
+import sys
 from requests_html import HTMLSession
 from bs4 import BeautifulSoup, PageElement, ResultSet
 import re
@@ -101,6 +102,7 @@ class SteamScraper(Scraper):
         self.listUrl = self.prepareListUrl()
 
     def run(self) -> None:
+        print("Running Steam scraper...", file=sys.stderr)
         session = HTMLSession()
 
         start = 0
@@ -153,6 +155,7 @@ class SteamScraper(Scraper):
 
             start = start + 100
             listUrl = self.prepareListUrl(start)
+        print("Steam scraper run finished.", file=sys.stderr)
 
     def prepareListUrl(self, start=0, count=100) -> str:
         return "https://store.steampowered.com/search/results/?query&start={}&count={}&infinite=1".format(start, count)
@@ -210,15 +213,17 @@ class GogScraper(Scraper):
                 isFree = tile.find("span", {
                     "selenium-id": "productPriceFreeLabel"
                 }, recursive = True) is not None
-                price: float
+                price: float = 0
                 priceAfterDiscount: float | None = None
                 if isFree:
                     price = 0
-                if baseValue is not None:
+                elif baseValue is not None:
                     priceAfterDiscount = finalValue
                     price = baseValue
-                else:
+                elif finalValue is not None:
                     price = finalValue
+                else:
+                    price = 0
                 data = Data(
                     type="gog",
                     url=url,
@@ -232,50 +237,77 @@ class GogScraper(Scraper):
         return output
 
     def run(self) -> None:
+        print("Running GOG scraper...", file=sys.stderr)
         page = 1
         pageNumber = 0
         session = HTMLSession()
+        print("Downloading first page...", file=sys.stderr)
         r = session.get(self.prepareListUrl(page))
-        json = r.json()
-        soup = BeautifulSoup(json['results_html'], "html.parser")
-        # Extract the amount of pages to go
-        pageNumbers: ResultSet[PageElement] = soup.find_all("button", {
-            "selenium-id": "paginationPage"
-        })
-        lastPageNumber = pageNumbers[-1]
-        innerText= lastPageNumber.contents[0]
-        pageNumber = int(str(innerText.string))
-        while (page <= pageNumber):
-            r = session.get(self.prepareListUrl(page))
-            json = r.json()
-            soup = BeautifulSoup(json['results_html'], "html.parser")
-            for game in self.extractData(soup):
+        print("Downloaded page 1.", file=sys.stderr)
+        responseText = r.text
+        try:
+            soup = BeautifulSoup(responseText, "html.parser")
+            # Extract the amount of pages to go
+            pageNumbers: ResultSet[PageElement] = soup.find_all("button", {
+                "selenium-id": "paginationPage"
+            })
+            lastPageNumber = pageNumbers[-1]
+            innerText = lastPageNumber.contents[0]
+            pageNumber = int(str(innerText.string))
+            print(f"There are {pageNumber} pages of games to scrape", file=sys.stderr)
+            games = self.extractData(soup)
+            print(f"Found {len(games)} games", file=sys.stderr)
+            for game in games:
                 self.db.save(game)
             page += 1
-    
+        except:
+            print("Could not parse HTML.", file=sys.stderr)
+        
+        while (page <= pageNumber):
+            try:
+                print(f"Getting page {page}...", file=sys.stderr)
+                r = session.get(self.prepareListUrl(page))
+            except:
+                print(f"Could not get page {page}", file=sys.stderr)
+                break
+            try:
+                print(f"Parsing page {page}...", file=sys.stderr)
+                soup = BeautifulSoup(r.text, "html.parser")
+                print(f"Parsed page {page}.", file=sys.stderr)
+                games = self.extractData(soup)
+                print(f"Found {len(games)} games", file=sys.stderr)
+            except:
+                print(f"Could not parse page {page}", file=sys.stderr)
+                break
+            try:
+                for game in games:
+                    self.db.save(game)
+                page += 1
+            except Exception as error:
+                print(f"Could not save games from page {page} to DB", file=sys.stderr)
+                print(f"Underlying error: {error}", file=sys.stderr)
+                break
+                
+            
+        print("GOG scraper run finished.", file=sys.stderr)
 
 
 class App:
     def __init__(self) -> None:
         self.db = PostgresAdapter()
-        self.scrapers = {
-            'steam': SteamScraper(self.db),
-            'gog': GogScraper(self.db),
-        }
+        self.scrapers = [
+            #SteamScraper(self.db),
+            GogScraper(self.db),
+        ]
 
     def run(self) -> None:
-        print("Running scrapers")
-        for scraper in self.scrapers.values():
-            try:
+        print("Running scrapers...", file=sys.stderr)
+        try:
+            for scraper in self.scrapers:
                 scraper.run()
-            except Exception as error:
-                print("An exception occurred:", error)
-
-    def runSteam(self) -> None:
-        pass
-
-    def runGog(self) -> None:
-        pass
+        except Exception as error:
+            print("An exception occurred:", error, file=sys.stderr)
+        print("Scraper run finished.", file=sys.stderr)
 
 
 if __name__ == "__main__":
