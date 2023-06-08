@@ -66,23 +66,244 @@ class PostgresAdapter(Database):
         query += " LIMIT " + str(limit)
         query += " OFFSET " + str(limit * (page - 1))
 
-        print(query, params)
-
         self.cur.execute(query, params)
         results = self.cur.fetchall()
 
         return results
 
+    def count(self, criteria: dict) -> int:
+        title = None
+
+        if ('limit' in criteria and criteria['limit']):
+            del criteria['limit']
+
+        if ('page' in criteria and criteria['page']):
+            del criteria['page']
+
+        if ('title' in criteria and criteria['title']):
+            title = criteria['title']
+            del criteria['title']
+
+        conditions = []
+        params = []
+        for key, value in criteria.items():
+            conditions.append("{} = %s".format(key))
+            params.append(value)
+
+        if (title):
+            conditions.append("LOWER(title) LIKE %s")
+            params.append("%" + title + "%")
+
+        query = "SELECT count(id) FROM public.data "
+        query += " WHERE " if bool(conditions) > 0 else ""
+        query += " AND ".join(conditions)
+
+        self.cur.execute(query, params)
+        results = self.cur.fetchone()
+
+        return results['count']
+    
+def preparePagination(db: Database, criteria: dict) -> list:
+    pagination = []
+
+    limit = criteria['limit'] if 'limit' in criteria and criteria['limit'] else 20
+    page = criteria['page'] if 'page' in criteria and criteria['page'] else 1
+    count = db.count(criteria)
+    max = int(count / limit)
+
+    if max <= 3:
+        for i in range(1, 4):
+            pagination.append({
+                'active': i == page,
+                'page': i,
+            })
+    elif max == 4:
+        if (page == 1):
+            pagination.append({
+                'active': True,
+                'page': 1,
+            })
+            pagination.append({
+                'active': False,
+                'page': 2,
+            })
+            pagination.append({
+                'active': False,
+                'page': None,
+            })
+            pagination.append({
+                'active': False,
+                'page': 4,
+            })
+        elif (page == 2):
+            pagination.append({
+                'active': False,
+                'page': 1,
+            })
+            pagination.append({
+                'active': True,
+                'page': 2,
+            })
+            pagination.append({
+                'active': False,
+                'page': 3,
+            })
+            pagination.append({
+                'active': False,
+                'page': 4,
+            })
+        elif (page == 3):
+            pagination.append({
+                'active': False,
+                'page': 1,
+            })
+            pagination.append({
+                'active': False,
+                'page': 2,
+            })
+            pagination.append({
+                'active': True,
+                'page': 3,
+            })
+            pagination.append({
+                'active': False,
+                'page': 4,
+            })
+        elif (page == 4):
+            pagination.append({
+                'active': False,
+                'page': 1,
+            })
+            pagination.append({
+                'active': False,
+                'page': None,
+            })
+            pagination.append({
+                'active': False,
+                'page': 3,
+            })
+            pagination.append({
+                'active': True,
+                'page': 4,
+            })
+
+    elif max == 5:
+        if (page == 1):
+            for i in range(1, 3):
+                pagination.append({
+                    'active': i == page,
+                    'page': i,
+                })
+            pagination.append({
+                'active': False,
+                'page': None,
+            })
+            pagination.append({
+                'active': False,
+                'page': max,
+            })
+        if (page == 2):
+            for i in range(1, 4):
+                pagination.append({
+                    'active': i == page,
+                    'page': i,
+                })
+            pagination.append({
+                'active': False,
+                'page': None,
+            })
+            pagination.append({
+                'active': False,
+                'page': max,
+            })
+        elif (page == 3):
+            for i in range(1, 6):
+                pagination.append({
+                    'active': i == page,
+                    'page': i,
+                })
+        if (page == 4):
+            pagination.append({
+                'active': False,
+                'page': 1,
+            })
+            pagination.append({
+                'active': False,
+                'page': None,
+            })
+            for i in range(3, 6):
+                pagination.append({
+                    'active': i == page,
+                    'page': i,
+                })
+        if (page == 5):
+            pagination.append({
+                'active': False,
+                'page': 1,
+            })
+            pagination.append({
+                'active': False,
+                'page': None,
+            })
+            for i in range(4, 6):
+                pagination.append({
+                    'active': i == page,
+                    'page': i,
+                })
+
+    elif max >= 6:
+        if page <= 3:
+            for i in range(1, page + 2):
+                pagination.append({
+                    'active': i == page,
+                    'page': i,
+                })
+        else:
+            pagination.append({
+                'active': False,
+                'page': 1,
+            })
+
+        pagination.append({
+            'active': False,
+            'page': None,
+        })
+
+        for i in range(page - 1, page + 2):
+            pagination.append({
+                'active': i == page,
+                'page': i,
+            })
+
+        pagination.append({
+            'active': False,
+            'page': None,
+        })
+
+        if page >= max - 2:
+            for i in range(page - 1, max + 1):
+                pagination.append({
+                    'active': i == page,
+                    'page': i,
+                })
+        else:
+            pagination.append({
+                'active': False,
+                'page': max,
+            })
+
+    return pagination
+
 @app.get("/api/latest")
-async def test():
+async def latest():
     db = PostgresAdapter()
 
     return {
-        'data': db.findOneBy()
+        'item': db.findOneBy()
     }
 
 @app.get("/api/list")
-async def test(limit: int = None, page: int = None, t: str = None, type: str None):
+async def list(limit: int = None, page: int = None, t: str = None, type: str = None):
     db = PostgresAdapter()
 
     criteria = {}
@@ -100,7 +321,8 @@ async def test(limit: int = None, page: int = None, t: str = None, type: str Non
         criteria['type'] = type.lower().strip()
 
     return {
-        'data': db.findBy(criteria)
+        'list': db.findBy(criteria.copy()),
+        'pagination': preparePagination(db, criteria.copy())
     }
 
 if __name__ == "__main__":
