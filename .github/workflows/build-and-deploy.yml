@@ -96,6 +96,7 @@ jobs:
             - name: Set env
               run: |
                 echo "PYTHON_IMAGE_VERSION=${PYTHON_IMAGE_VERSION}" >> $GITHUB_ENV
+                echo "DB_PORT=${DB_PORT}" >> $GITHUB_ENV
                 echo "POSTGRES_USER=${POSTGRES_USER}" >> $GITHUB_ENV
                 echo "POSTGRES_PASSWORD=${POSTGRES_PASSWORD}" >> $GITHUB_ENV
                 echo "POSTGRES_DB=${POSTGRES_DB}" >> $GITHUB_ENV
@@ -139,6 +140,7 @@ jobs:
                   cache-to: type=gha,mode=max
                   build-args: |
                     PYTHON_IMAGE_VERSION=${{ env.PYTHON_IMAGE_VERSION }}
+                    DB_PORT=${{ env.DB_PORT }}
                     POSTGRES_USER=${{ env.POSTGRES_USER }}
                     POSTGRES_PASSWORD=${{ env.POSTGRES_PASSWORD }}
                     POSTGRES_DB=${{ env.POSTGRES_DB }}
@@ -169,6 +171,7 @@ jobs:
             - name: Set env
               run: |
                 echo "PYTHON_IMAGE_VERSION=${PYTHON_IMAGE_VERSION}" >> $GITHUB_ENV
+                echo "DB_PORT=${DB_PORT}" >> $GITHUB_ENV
                 echo "POSTGRES_USER=${POSTGRES_USER}" >> $GITHUB_ENV
                 echo "POSTGRES_PASSWORD=${POSTGRES_PASSWORD}" >> $GITHUB_ENV
                 echo "POSTGRES_DB=${POSTGRES_DB}" >> $GITHUB_ENV
