@@ -25,10 +25,13 @@ services:
             dockerfile: docker/scraper/dev/Dockerfile
             args:
                 - PYTHON_IMAGE_VERSION=${PYTHON_IMAGE_VERSION}
+                - POSTGRES_USER=${POSTGRES_USER}
+                - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+                - POSTGRES_DATABASE=${POSTGRES_DATABASE}
+                - POSTGRES_HOST=${POSTGRES_HOST}
+                - POSTGRES_PORT=${POSTGRES_PORT}
         platform: linux/x86_64
         working_dir: /app
-        ports:
-            - ${BACKEND_PORT}:8000
         volumes:
             - ./scraper:/app:rw
             - /etc/timezone:/etc/timezone:ro
@@ -40,7 +43,7 @@ services:
     frontend:
         build:
             context: .
-            dockerfile: docker/node/dev/Dockerfile
+            dockerfile: docker/frontend/dev/Dockerfile
             args:
                 - NODE_IMAGE_VERSION=${NODE_IMAGE_VERSION}
         platform: linux/x86_64
@@ -55,7 +58,25 @@ services:
             - common
             - frontend
 
+    db:
+        image: postgres:${POSTGRES_IMAGE_VERSION}
+        platform: linux/x86_64
+        ports:
+            - ${DB_PORT}:5432
+        environment:
+            POSTGRES_USER: ${POSTGRES_USER}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+            POSTGRES_DB: ${POSTGRES_DB}
+        volumes:
+            - db_data:/var/lib/postgresql/data:rw
+        networks:
+            - common
+            - backend
+
 networks:
     common:
     frontend:
     backend:
+
+volumes:
+    db_data:
