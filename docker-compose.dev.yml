@@ -38,7 +38,7 @@ services:
         platform: linux/x86_64
         working_dir: /app
         ports:
-            - ${BACKEND_PORT}:8000
+            - ${BACKEND_PORT}:8100
         volumes:
             - ./backend:/app:rw
             - /etc/timezone:/etc/timezone:ro
@@ -87,7 +87,7 @@ services:
         image: postgres:${POSTGRES_IMAGE_VERSION}
         platform: linux/x86_64
         ports:
-            - ${DB_PORT}:5432
+            - ${DB_PORT}:5544
         environment:
             POSTGRES_USER: ${POSTGRES_USER}
             POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}

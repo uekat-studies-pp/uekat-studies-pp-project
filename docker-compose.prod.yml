@@ -20,7 +20,7 @@ services:
         platform: linux/x86_64
         working_dir: /app
         ports:
-            - ${BACKEND_PORT}:8000
+            - ${BACKEND_PORT}:8100
         depends_on:
             - db
         networks:
