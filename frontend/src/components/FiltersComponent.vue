@@ -1,79 +1,58 @@
 <template>
-  <div>
-    <form :action="action" :method="method" @submit.prevent="submit">
-      <div v-for="(element, key) in elements" v-bind:key="key">
-        <div v-if="element.type == 'select'">
-          <label :for="element.id">{{ element.label }}</label>
-          <select :id="element.id" :name="element.name">
-            <option v-for="(v, k) in element.options" v-bind:key="k" :value="k" :selected="urlParamHasKeyValue(element.name, k) ? true : false">
-              {{ v }}
-            </option>
-          </select>
-        </div>
-        <div v-else>
-          <label :for="element.id">{{ element.label }}</label>
-          <input :type="element.type" :id="element.id" :name="element.name" :value="element.value" />
-        </div>
-      </div>
-      <input type="submit" value="Submit" />
-    </form>
+  <div class="column items-center q-mt-xl">
+    <div style="width: 30vw" class="row justify-between">
+      <q-input
+          style="width: 20vw;"
+          v-model="search_text"
+          outlined
+          label="Tytuł"
+      />
+
+      <q-option-group
+          v-model="search_type"
+          :options="[
+              {
+                label: 'Steam',
+                value: 'steam'
+              },
+              {
+                label: 'Gog',
+                value: 'gog'
+              },
+            ]"
+      />
+    </div>
+
+    <q-btn
+      label="Wyszukaj"
+      color="primary"
+      @click="submit"
+    />
   </div>
 </template>
 
 <script lang="ts">
 
-export default {
+import {ref, defineComponent} from "vue";
+
+export default defineComponent({
   name: "FiltersComponent",
-  data() {
-    const queryString = window.location.search;
-    const urlParams = new URLSearchParams(queryString);
+  emits: ['updateListFromApi'],
+  setup(props, {emit}) {
+    const search_text = ref('')
+    const search_type = ref('steam')
+
+    function submit() {
+      emit('updateListFromApi', {t: search_text.value, type: search_type.value})
+    }
 
     return {
-      urlParams: urlParams,
-      action: "/",
-      method: "get",
-      elements: [
-        {
-          type: "text",
-          id: "t",
-          name: "t",
-          value: urlParams.get('t'),
-          label: "Tytuł",
-        },
-        {
-          type: "select",
-          id: "type",
-          name: "type",
-          value: urlParams.get('type'),
-          label: "Typ",
-          options: {
-            'steam': "Steam",
-            'gog': "Gog",
-          }
-        }
-      ]
-    }
-  },
-  methods: {
-    urlParamHasKeyValue(key: string, value: string) {
-      return this.urlParams.get(key) == value
-    },
-    submit(e) {
-      const criteria = {};
-      const formData = new FormData(e.currentTarget);
-
-      if (formData.has('t')) {
-        criteria['t'] = formData.get('t');
-      }
-
-      if (formData.has('type')) {
-        criteria['type'] = formData.get('type');
-      }
-
-      this.$emit('updateListFromApi', criteria);
+      search_text,
+      search_type,
+      submit
     }
   }
-}
+})
 </script>
 
 <style scoped></style>

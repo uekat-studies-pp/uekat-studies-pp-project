@@ -1,6 +1,7 @@
 <template>
-  <table>
-    <thead>
+  <div class="row justify-center q-my-xl">
+    <table>
+      <thead>
       <tr>
         <th>Tytuł</th>
         <th>Typ</th>
@@ -8,11 +9,12 @@
         <th>Cena po promocji</th>
         <th>Link</th>
       </tr>
-    </thead>
-    <tbody>
+      </thead>
+      <tbody>
       <ContentItemComponent v-for="(item, key) in list" v-bind:key="key" :item="item"></ContentItemComponent>
-    </tbody>
-  </table>
+      </tbody>
+    </table>
+  </div>
 </template>
 
 <script lang="ts">
