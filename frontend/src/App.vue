@@ -31,7 +31,6 @@ export default {
     updateListFromApi(criteria: { [key: string]: any } = {}) {
       const self = this;
       const url = new URL(window.location.toString());
-      url.pathname = "/api/list";
 
       for (const key in criteria) {
         if (Object.prototype.hasOwnProperty.call(criteria, key)) {
@@ -39,6 +38,10 @@ export default {
           url.searchParams.set(key, value);
         }
       }
+
+      history.pushState({}, "", url);
+
+      url.pathname = "/api/list";
 
       fetch(url.toString()).then(response => response.json()).then(data => {
         self.list = data.list;

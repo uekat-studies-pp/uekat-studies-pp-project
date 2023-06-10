@@ -60,8 +60,12 @@ export default {
       return this.urlParams.get(key) == value
     },
     submit(e: any) {
-      const criteria: { [key: string]: any } = {};
+      let criteria: { [key: string]: any } = {};
       const formData = new FormData(e.currentTarget);
+
+      this.setCriteriaFromCurrentUrl(criteria);
+
+      criteria['page'] = 1;
 
       if (formData.has('t')) {
         criteria['t'] = formData.get('t');
@@ -72,6 +76,12 @@ export default {
       }
 
       this.$emit('updateListFromApi', criteria);
+    },
+    setCriteriaFromCurrentUrl(criteria: { [key: string]: any }) {
+      const url = new URL(window.location.toString());
+      url.searchParams.forEach((value, key) => {
+        criteria[key] = value;
+      });
     }
   }
 }

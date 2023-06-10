@@ -112,7 +112,7 @@ def preparePagination(db: Database, criteria: dict) -> list:
     max = int(count / limit)
 
     if max <= 3:
-        for i in range(1, 4):
+        for i in range(1, max + 1):
             pagination.append({
                 'active': i == page,
                 'page': i,
