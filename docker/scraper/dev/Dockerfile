@@ -14,4 +14,8 @@ ENV POSTGRES_HOST=${POSTGRES_HOST}
 ARG POSTGRES_PORT=5432
 ENV POSTGRES_PORT=${POSTGRES_PORT}
 
-CMD ["sh", "-c", "pip install -r requirements.txt; python /app/main.py; crond"]
+COPY scraper/requirements.txt requirements.txt
+RUN ["pip", "install", "-r", "requirements.txt"]
+COPY scraper/main.py main.py
+CMD ["python", "main.py"]
+#CMD ["crond"]
