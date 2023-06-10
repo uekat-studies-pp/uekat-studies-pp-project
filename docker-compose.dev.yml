@@ -3,7 +3,7 @@ version: "3"
 services:
     nginx:
         build:
-            context: ./docker/nginx/dev
+            context: .
             args:
                 - NGINX_IMAGE_VERSION=${NGINX_IMAGE_VERSION}
         platform: linux/x86_64
@@ -100,6 +100,7 @@ services:
 networks:
     frontend:
     backend:
+
 
 volumes:
     db_data:
