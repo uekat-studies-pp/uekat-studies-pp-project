@@ -121,10 +121,10 @@ class SteamScraper(Scraper):
                     priceAfterDiscount = None
                     price = element.find(class_='search_price')
                     if "discounted" in price.attrs['class'] and price.find('strike'):
-                        priceAfterDiscount = price.find('strike').text
-
                         br = price.find('br')
-                        price = br.next_sibling.strip()
+                        priceAfterDiscount = br.next_sibling.strip()
+
+                        price = price.find('strike').text
                     else:
                         price = price.text.strip()
 
@@ -137,8 +137,6 @@ class SteamScraper(Scraper):
                         ',', '.')) if price and price != 0 else 0
                     priceAfterDiscount = float(trim.sub('', priceAfterDiscount).replace(
                         ',', '.')) if priceAfterDiscount else None
-
-                    # print(url, title, price, priceAfterDiscount)
 
                     data = Data(
                         type='steam',
